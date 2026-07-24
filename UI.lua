@@ -2744,6 +2744,16 @@ Components.TitleBar = (function()
 					FillDirection = Enum.FillDirection.Horizontal,
 					SortOrder = Enum.SortOrder.LayoutOrder,
 				}),
+				New("ImageLabel", {
+					Image = "rbxassetid://119496231602582",
+					Size = UDim2.fromOffset(20, 20),
+					BackgroundTransparency = 1,
+					LayoutOrder = 1,
+					ScaleType = Enum.ScaleType.Fit,
+					ThemeTag = {
+						ImageColor3 = "Text",
+					},
+				}),
 				New("TextLabel", {
 					RichText = true,
 					Text = Config.Title,
@@ -6453,3 +6463,91 @@ else
 end
 
 return Library, SaveManager, InterfaceManager
+Creator.AddSignal(Window.TitleBar.Frame.InputBegan, function(Input)
+			if
+				Input.UserInputType == Enum.UserInputType.MouseButton1
+				or Input.UserInputType == Enum.UserInputType.Touch
+			then
+				Dragging = true
+				MousePos = Input.Position
+				StartPos = Window.Root.Position
+
+				if Window.Maximized then
+					StartPos = UDim2.fromOffset(
+						Mouse.X - (Mouse.X * ((OldSizeX - 100) / Window.Root.AbsoluteSize.X)),
+						Mouse.Y - (Mouse.Y * (OldSizeY / Window.Root.AbsoluteSize.Y))
+					)
+				end
+
+				Input.Changed:Connect(function()
+					if Input.UserInputState == Enum.UserInputState.End then
+						Dragging = false
+					end
+				end)
+			end
+		end)
+
+		Creator.AddSignal(Window.TitleBar.Frame.InputChanged, function(Input)
+			if
+				Input.UserInputType == Enum.UserInputType.MouseMovement
+				or Input.UserInputType == Enum.UserInputType.Touch
+			then
+				DragInput = Input
+			end
+		end)
+
+		Creator.AddSignal(ResizeStartFrame.InputBegan, function(Input)
+			if
+				Input.UserInputType == Enum.UserInputType.MouseButton1
+				or Input.UserInputType == Enum.UserInputType.Touch
+			then
+				Resizing = true
+				ResizePos = Input.Position
+			end
+		end)
+
+		Creator.AddSignal(UserInputService.InputChanged, function(Input)
+			if Input == DragInput and Dragging then
+				if Window.Maximized then
+					Window.Maximize(false, true, true)
+				end
+				local Delta = Input.Position - MousePos
+				Window.Position = UDim2.fromOffset(StartPos.X.Offset + Delta.X, StartPos.Y.Offset + Delta.Y)
+				PosMotor:setGoal({
+					X = Instant(Window.Position.X.Offset),
+					Y = Instant(Window.Position.Y.Offset),
+				})
+			end
+
+			if Resizing and Input.UserInputType == Enum.UserInputType.MouseMovement then
+				local Delta = Input.Position - ResizePos
+				local NewWidth = math.clamp(Window.Size.X.Offset + Delta.X, 450, 2000)
+				local NewHeight = math.clamp(Window.Size.Y.Offset + Delta.Y, 300, 2000)
+
+				SizeMotor:setGoal({
+					X = Instant(NewWidth),
+					Y = Instant(NewHeight),
+				})
+				Window.Size = UDim2.fromOffset(NewWidth, NewHeight)
+				ResizePos = Input.Position
+			end
+		end)
+
+		Creator.AddSignal(UserInputService.InputEnded, function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+				Resizing = false
+				Dragging = false
+			end
+		end)
+
+		function Window:Minimize()
+			Window.Minimized = not Window.Minimized
+			Window.Root.Visible = not Window.Minimized
+		end
+
+		return Window
+	end
+end)()
+
+Library.Window = Components.Window
+return Library

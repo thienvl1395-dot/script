@@ -2904,7 +2904,7 @@ function DiscordLib:Window(text)
 				ColorSelection.AnchorPoint = Vector2.new(0.5, 0.5)
 				ColorSelection.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				ColorSelection.BackgroundTransparency = 1.000
-				ColorSelection.Position = UDim2.new(S, 0, 1 - V, 0)
+				ColorSelection.Position = UDim2.new(preset and select(3, Color3.toHSV(preset)))
 				ColorSelection.Size = UDim2.new(0, 18, 0, 18)
 				ColorSelection.Image = "http://www.roblox.com/asset/?id=4805639000"
 				ColorSelection.ScaleType = Enum.ScaleType.Fit
@@ -2937,7 +2937,7 @@ function DiscordLib:Window(text)
 				HueSelection.AnchorPoint = Vector2.new(0.5, 0.5)
 				HueSelection.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				HueSelection.BackgroundTransparency = 1.000
-				HueSelection.Position = UDim2.new(0.48, 0, 1 - H, 0)
+				HueSelection.Position = UDim2.new(0.48, 0, 1 - select(1, Color3.toHSV(preset)))
 				HueSelection.Size = UDim2.new(0, 18, 0, 18)
 				HueSelection.Image = "http://www.roblox.com/asset/?id=4805639000"
 

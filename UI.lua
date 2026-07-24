@@ -1,9 +1,3 @@
---[[
-	Credit:
-	Original Fluent : https://github.com/dawid-scripts/Fluent
-	Themes : https://github.com/ActualMasterOogway/Fluent-Renewed/
-]]
-
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -1241,19 +1235,16 @@ end
 function Creator.New(Name, Properties, Children)
 	local Object = Instance.new(Name)
 
-	-- Default properties
 	for Name, Value in next, Creator.DefaultProperties[Name] or {} do
 		Object[Name] = Value
 	end
 
-	-- Properties
 	for Name, Value in next, Properties or {} do
 		if Name ~= "ThemeTag" then
 			Object[Name] = Value
 		end
 	end
 
-	-- Children
 	for _, Child in next, Children or {} do
 		Child.Parent = Object
 	end
@@ -1292,28 +1283,18 @@ end
 Library.Creator = Creator
 
 local New = Creator.New
+local LibraryID = "Roblox/Ui"
 
--- function Library:GenerateUUID()
+local ProtectGui = protectgui or (syn and syn.protect_gui) or function(gui)
+	local suc = pcall(function()
+		gui.Parent = game:GetService("CoreGui")
+	end)
+	if not suc then
+		gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+	end
+end
 
---     local function randomHex()
---         return string.format("%x", math.random(0, 15))
---     end
-
---     local uuid = string.format(
---         "%08x-%04x-4%03x-%04x-%012x",
---         math.random(0, 0xFFFFFFFF),        -- First 8 hex digits
---         math.random(0, 0xFFFF),            -- Second 4 hex digits
---         math.random(0, 0xFFF),             -- Third 4 hex digits
---         math.random(0, 0xFFFF),            -- Fourth 4 hex digits
---         math.random(0, 0xFFFFFFFFFFFF)     -- Last 12 hex digits
---     )
---     return uuid
--- end
-
-local LibraryID = "Roblox/Ui"--Library:GenerateUUID()
-
---local PanelParent = RunService:IsStudio() and LocalPlayer.PlayerGui or game:GetService("CoreGui")
-local PanelParent = LocalPlayer.PlayerGui
+local PanelParent = (gethui and gethui()) or game:GetService("CoreGui")
 local Panel = PanelParent:FindFirstChild(LibraryID)
 if Panel then
     Panel:Destroy()
@@ -1322,6 +1303,8 @@ end
 local GUI = New("ScreenGui", {
 	Parent = PanelParent,
     Name = LibraryID,
+    ResetOnSpawn = false,
+    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 })
 
 Library.GUI = GUI
